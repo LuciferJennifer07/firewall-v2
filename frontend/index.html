@@ -3,1579 +3,601 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Firewall System — Command Center</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
+<title>AI Firewall System</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-/* ═══════════════════════════════════════════
-   DESIGN SYSTEM — Industrial Cyber Aesthetic
-   Dark terminal + neon accent + sharp grids
-═══════════════════════════════════════════ */
-:root {
-  --bg: #080c10;
-  --bg2: #0d1218;
-  --bg3: #111820;
-  --surface: #141c26;
-  --surface2: #1a2535;
-  --border: #1e2d40;
-  --border2: #263545;
-  --text: #c8d8e8;
-  --text2: #7890a8;
-  --text3: #4a6280;
-  --accent: #00e5ff;
-  --accent2: #0090b0;
-  --green: #00e676;
-  --green2: #00695c;
-  --red: #ff1744;
-  --red2: #7f0000;
-  --orange: #ff9100;
-  --orange2: #6d3a00;
-  --yellow: #ffd600;
-  --purple: #d500f9;
-  --font-mono: 'Space Mono', monospace;
-  --font-sans: 'Syne', sans-serif;
-  --radius: 4px;
-  --glow: 0 0 20px rgba(0, 229, 255, 0.15);
-  --glow-red: 0 0 20px rgba(255, 23, 68, 0.2);
-  --glow-green: 0 0 20px rgba(0, 230, 118, 0.15);
-}
-
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--font-sans);
-  min-height: 100vh;
-  overflow-x: hidden;
-}
-
-/* Scanline effect overlay */
-body::before {
-  content: '';
-  position: fixed; inset: 0;
-  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
-  pointer-events: none;
-  z-index: 9999;
-}
-
-/* ── LOGIN PAGE ─────────────────────────── */
-#login-page {
-  display: flex; align-items: center; justify-content: center;
-  min-height: 100vh;
-  background: radial-gradient(ellipse at 50% 0%, rgba(0,229,255,0.08) 0%, transparent 60%),
-              radial-gradient(ellipse at 0% 100%, rgba(213,0,249,0.05) 0%, transparent 50%), var(--bg);
-}
-
-.login-box {
-  width: 420px;
-  border: 1px solid var(--border2);
-  background: var(--surface);
-  padding: 48px 40px;
-  position: relative;
-  box-shadow: var(--glow), inset 0 1px 0 rgba(255,255,255,0.05);
-}
-
-.login-box::before {
-  content: '';
-  position: absolute; top: 0; left: 0; right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--accent), transparent);
-}
-
-.login-logo {
-  text-align: center; margin-bottom: 36px;
-}
-
-.login-logo .shield {
-  font-size: 40px; display: block; margin-bottom: 12px;
-  filter: drop-shadow(0 0 12px rgba(0,229,255,0.5));
-}
-
-.login-logo h1 {
-  font-family: var(--font-sans); font-size: 20px; font-weight: 800;
-  letter-spacing: 3px; text-transform: uppercase; color: var(--accent);
-}
-
-.login-logo p {
-  font-family: var(--font-mono); font-size: 10px;
-  color: var(--text3); letter-spacing: 2px; margin-top: 4px;
-}
-
-.form-group { margin-bottom: 20px; }
-
-.form-group label {
-  display: block; font-family: var(--font-mono); font-size: 10px;
-  letter-spacing: 2px; color: var(--text3); text-transform: uppercase; margin-bottom: 8px;
-}
-
-.form-group input {
-  width: 100%;
-  background: var(--bg2); border: 1px solid var(--border2);
-  color: var(--text); font-family: var(--font-mono); font-size: 14px;
-  padding: 12px 16px; outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.form-group input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 1px var(--accent2), var(--glow);
-}
-
-.btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  padding: 12px 24px; border: none; cursor: pointer;
-  font-family: var(--font-sans); font-weight: 700; font-size: 13px;
-  letter-spacing: 2px; text-transform: uppercase; transition: all 0.2s;
-  text-decoration: none;
-}
-
-.btn-primary {
-  background: var(--accent); color: var(--bg);
-  width: 100%; padding: 14px;
-  box-shadow: 0 0 24px rgba(0,229,255,0.3);
-}
-
-.btn-primary:hover { background: #33ecff; box-shadow: 0 0 32px rgba(0,229,255,0.5); }
-.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-
-.btn-danger { background: var(--red); color: #fff; font-size: 11px; padding: 8px 16px; }
-.btn-danger:hover { background: #ff4569; }
-
-.btn-warn { background: var(--orange); color: var(--bg); font-size: 11px; padding: 8px 16px; }
-.btn-warn:hover { background: #ffa733; }
-
-.btn-ghost {
-  background: transparent; border: 1px solid var(--border2);
-  color: var(--text2); font-size: 11px; padding: 8px 16px;
-}
-.btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
-
-.btn-green { background: var(--green); color: var(--bg); font-size: 11px; padding: 8px 16px; }
-.btn-green:hover { background: #33eb91; }
-
-.login-error {
-  color: var(--red); font-family: var(--font-mono); font-size: 12px;
-  text-align: center; margin-top: 16px; min-height: 20px;
-}
-
-.login-hint {
-  text-align: center; margin-top: 20px;
-  font-family: var(--font-mono); font-size: 11px; color: var(--text3);
-}
-
-.login-tabs { display: flex; margin-bottom: 28px; border-bottom: 1px solid var(--border); }
-.login-tab {
-  flex: 1; padding: 10px; text-align: center; cursor: pointer;
-  font-family: var(--font-mono); font-size: 11px; letter-spacing: 1px;
-  color: var(--text3); border-bottom: 2px solid transparent;
-  transition: all 0.2s; background: none; border-top: none; border-left: none; border-right: none;
-}
-.login-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
-
-/* ── APP LAYOUT ─────────────────────────── */
-#app { display: none; min-height: 100vh; }
-
-.topbar {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-  height: 56px; background: var(--bg2);
-  border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; padding: 0 24px; gap: 16px;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.5);
-}
-
-.topbar-logo {
-  font-family: var(--font-sans); font-weight: 800; font-size: 14px;
-  letter-spacing: 3px; color: var(--accent); text-transform: uppercase;
-  display: flex; align-items: center; gap: 10px;
-}
-
-.topbar-logo span { font-size: 20px; }
-
-.topbar-status {
-  display: flex; align-items: center; gap: 6px;
-  font-family: var(--font-mono); font-size: 11px; color: var(--green);
-}
-
-.topbar-status::before {
-  content: ''; width: 6px; height: 6px; border-radius: 50%;
-  background: var(--green); animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(0,230,118,0.4); }
-  50% { box-shadow: 0 0 0 6px rgba(0,230,118,0); }
-}
-
-.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 20px; }
-
-.topbar-user {
-  font-family: var(--font-mono); font-size: 11px; color: var(--text2);
-  display: flex; align-items: center; gap: 8px;
-}
-
-.topbar-user .role-badge {
-  background: var(--accent2); color: var(--accent); padding: 2px 8px;
-  font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
-}
-
-.btn-logout {
-  background: none; border: 1px solid var(--border); color: var(--text3);
-  font-family: var(--font-mono); font-size: 10px; padding: 6px 14px;
-  cursor: pointer; letter-spacing: 1px; transition: all 0.2s;
-}
-.btn-logout:hover { border-color: var(--red); color: var(--red); }
-
-/* ── SIDEBAR ────────────────────────────── */
-.sidebar {
-  position: fixed; top: 56px; left: 0; bottom: 0; width: 220px;
-  background: var(--bg2); border-right: 1px solid var(--border);
-  padding: 24px 0; overflow-y: auto;
-}
-
-.nav-section-label {
-  font-family: var(--font-mono); font-size: 9px; letter-spacing: 2px;
-  color: var(--text3); text-transform: uppercase;
-  padding: 0 20px 8px; margin-top: 16px;
-}
-
-.nav-item {
-  display: flex; align-items: center; gap: 12px;
-  padding: 10px 20px; cursor: pointer; transition: all 0.15s;
-  border-left: 3px solid transparent;
-  font-size: 13px; font-weight: 600; color: var(--text2);
-  user-select: none;
-}
-
-.nav-item:hover { background: var(--surface); color: var(--text); }
-
-.nav-item.active {
-  background: rgba(0,229,255,0.06); color: var(--accent);
-  border-left-color: var(--accent);
-}
-
-.nav-item .nav-icon { font-size: 16px; width: 20px; text-align: center; }
-
-.nav-badge {
-  margin-left: auto; background: var(--red); color: #fff;
-  font-family: var(--font-mono); font-size: 10px;
-  padding: 1px 6px; border-radius: 10px; min-width: 20px; text-align: center;
-}
-
-/* ── MAIN CONTENT ───────────────────────── */
-.main-content {
-  margin-left: 220px; padding-top: 56px; min-height: 100vh;
-}
-
-.page { display: none; padding: 32px; animation: fadeIn 0.3s ease; }
-.page.active { display: block; }
-
-@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-
-.page-header { margin-bottom: 28px; }
-
-.page-title {
-  font-size: 24px; font-weight: 800; letter-spacing: 1px;
-  color: var(--text);
-}
-
-.page-subtitle {
-  font-family: var(--font-mono); font-size: 11px; color: var(--text3);
-  margin-top: 4px; letter-spacing: 1px;
-}
-
-/* ── STAT CARDS ─────────────────────────── */
-.stats-grid {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px; margin-bottom: 28px;
-}
-
-.stat-card {
-  background: var(--surface); border: 1px solid var(--border);
-  padding: 20px 24px; position: relative; overflow: hidden;
-  transition: border-color 0.2s;
-}
-
-.stat-card::after {
-  content: ''; position: absolute;
-  bottom: 0; left: 0; right: 0; height: 2px;
-}
-
-.stat-card.blue::after { background: var(--accent); }
-.stat-card.green::after { background: var(--green); }
-.stat-card.red::after { background: var(--red); }
-.stat-card.orange::after { background: var(--orange); }
-.stat-card.purple::after { background: var(--purple); }
-
-.stat-card:hover { border-color: var(--border2); }
-
-.stat-label {
-  font-family: var(--font-mono); font-size: 10px; letter-spacing: 2px;
-  color: var(--text3); text-transform: uppercase; margin-bottom: 10px;
-}
-
-.stat-value {
-  font-family: var(--font-mono); font-size: 32px; font-weight: 700;
-  line-height: 1; color: var(--text);
-}
-
-.stat-value.red { color: var(--red); }
-.stat-value.green { color: var(--green); }
-.stat-value.orange { color: var(--orange); }
-.stat-value.blue { color: var(--accent); }
-
-.stat-sub {
-  font-family: var(--font-mono); font-size: 11px; color: var(--text3);
-  margin-top: 6px;
-}
-
-.stat-icon {
-  position: absolute; top: 16px; right: 16px; font-size: 28px; opacity: 0.15;
-}
-
-/* ── GRID LAYOUTS ───────────────────────── */
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
-.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 20px; }
-@media (max-width: 1100px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
-
-/* ── PANELS ─────────────────────────────── */
-.panel {
-  background: var(--surface); border: 1px solid var(--border);
-  margin-bottom: 20px;
-}
-
-.panel-header {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 16px 20px; border-bottom: 1px solid var(--border);
-  background: var(--bg2);
-}
-
-.panel-title {
-  font-size: 13px; font-weight: 700; letter-spacing: 1px;
-  text-transform: uppercase; color: var(--text);
-  display: flex; align-items: center; gap: 10px;
-}
-
-.panel-body { padding: 20px; }
-
-/* ── TABLES ─────────────────────────────── */
-.table-wrap { overflow-x: auto; }
-
-table {
-  width: 100%; border-collapse: collapse;
-  font-family: var(--font-mono); font-size: 12px;
-}
-
-thead th {
-  text-align: left; padding: 10px 14px;
-  font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
-  color: var(--text3); border-bottom: 1px solid var(--border);
-  background: var(--bg2); font-weight: 700;
-}
-
-tbody tr {
-  border-bottom: 1px solid rgba(30,45,64,0.5);
-  transition: background 0.1s;
-}
-
-tbody tr:hover { background: rgba(20,28,38,0.6); }
-
-tbody td {
-  padding: 10px 14px; color: var(--text2); vertical-align: middle;
-}
-
-/* ── STATUS BADGES ──────────────────────── */
-.badge {
-  display: inline-flex; align-items: center; gap: 5px;
-  padding: 3px 10px; font-size: 10px; font-family: var(--font-mono);
-  letter-spacing: 1px; font-weight: 700; text-transform: uppercase;
-}
-
-.badge-allowed { background: rgba(0,230,118,0.12); color: var(--green); }
-.badge-blocked { background: rgba(255,23,68,0.12); color: var(--red); }
-.badge-anomaly { background: rgba(255,145,0,0.12); color: var(--orange); }
-.badge-rate_limited { background: rgba(213,0,249,0.12); color: var(--purple); }
-
-.badge-critical { background: rgba(255,23,68,0.15); color: var(--red); }
-.badge-high { background: rgba(255,145,0,0.15); color: var(--orange); }
-.badge-medium { background: rgba(255,214,0,0.12); color: var(--yellow); }
-.badge-low { background: rgba(0,230,118,0.12); color: var(--green); }
-
-/* ── INPUTS ─────────────────────────────── */
-.input-row { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
-
-input, select, textarea {
-  background: var(--bg2); border: 1px solid var(--border2);
-  color: var(--text); font-family: var(--font-mono); font-size: 13px;
-  padding: 10px 14px; outline: none; width: 100%;
-  transition: border-color 0.2s;
-}
-
-input:focus, select:focus { border-color: var(--accent); }
-
-select option { background: var(--bg2); }
-
-.input-group { flex: 1; min-width: 180px; }
-.input-group label {
-  display: block; font-family: var(--font-mono); font-size: 10px;
-  letter-spacing: 2px; color: var(--text3); text-transform: uppercase; margin-bottom: 6px;
-}
-
-/* ── ALERT ITEMS ────────────────────────── */
-.alert-item {
-  display: flex; align-items: flex-start; gap: 14px;
-  padding: 14px 16px; border-bottom: 1px solid var(--border);
-  transition: background 0.15s;
-}
-
-.alert-item:hover { background: rgba(20,28,38,0.5); }
-.alert-item:last-child { border-bottom: none; }
-
-.alert-severity-dot {
-  width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 4px;
-}
-
-.alert-severity-dot.critical { background: var(--red); box-shadow: 0 0 8px var(--red); }
-.alert-severity-dot.high { background: var(--orange); box-shadow: 0 0 8px var(--orange); }
-.alert-severity-dot.medium { background: var(--yellow); }
-.alert-severity-dot.low { background: var(--green); }
-
-.alert-content { flex: 1; }
-.alert-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
-.alert-meta { font-family: var(--font-mono); font-size: 10px; color: var(--text3); }
-
-.alert-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
-
-/* ── CHART ──────────────────────────────── */
-.chart-container { position: relative; height: 160px; }
-
-.bar-chart {
-  display: flex; align-items: flex-end; gap: 4px; height: 100%;
-  padding: 0 4px;
-}
-
-.bar-group { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; }
-
-.bar-stack { display: flex; flex-direction: column; width: 100%; height: 130px; justify-content: flex-end; }
-.bar-allowed { background: rgba(0,230,118,0.6); min-height: 1px; }
-.bar-blocked { background: rgba(255,23,68,0.7); min-height: 1px; }
-.bar-label { font-family: var(--font-mono); font-size: 8px; color: var(--text3); }
-
-/* ── TOP IPs ─────────────────────────────── */
-.ip-rank-item {
-  display: flex; align-items: center; gap: 12px;
-  padding: 8px 0; border-bottom: 1px solid rgba(30,45,64,0.4);
-}
-
-.ip-rank-num {
-  font-family: var(--font-mono); font-size: 11px; color: var(--text3); width: 20px;
-}
-
-.ip-rank-ip { font-family: var(--font-mono); font-size: 12px; color: var(--text); flex: 1; }
-
-.ip-rank-bar-wrap {
-  width: 80px; height: 6px; background: var(--border); overflow: hidden;
-}
-
-.ip-rank-bar { height: 100%; background: var(--red); }
-.ip-rank-count { font-family: var(--font-mono); font-size: 11px; color: var(--red); width: 30px; text-align: right; }
-
-/* ── RULE TAGS ──────────────────────────── */
-.rule-tag {
-  display: inline-flex; align-items: center; gap: 6px;
-  background: var(--surface2); border: 1px solid var(--border2);
-  padding: 6px 12px; margin: 4px; font-family: var(--font-mono); font-size: 12px;
-  color: var(--text);
-}
-
-.rule-tag .rule-type { font-size: 9px; color: var(--text3); text-transform: uppercase; }
-.rule-tag .remove-btn { cursor: pointer; color: var(--text3); transition: color 0.15s; }
-.rule-tag .remove-btn:hover { color: var(--red); }
-
-/* ── TOASTS ─────────────────────────────── */
-#toast-container {
-  position: fixed; bottom: 24px; right: 24px; z-index: 9000;
-  display: flex; flex-direction: column; gap: 8px;
-}
-
-.toast {
-  padding: 12px 18px; min-width: 280px;
-  font-family: var(--font-mono); font-size: 12px;
-  border-left: 3px solid; animation: slideIn 0.3s ease;
-  background: var(--surface); box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-}
-
-.toast.success { border-color: var(--green); color: var(--green); }
-.toast.error { border-color: var(--red); color: var(--red); }
-.toast.info { border-color: var(--accent); color: var(--accent); }
-.toast.warn { border-color: var(--orange); color: var(--orange); }
-
-@keyframes slideIn {
-  from { transform: translateX(100%); opacity: 0; }
-  to { transform: none; opacity: 1; }
-}
-
-/* ── LOADING ─────────────────────────────── */
-.loading {
-  display: flex; align-items: center; gap: 8px;
-  font-family: var(--font-mono); font-size: 12px; color: var(--text3);
-  padding: 20px; justify-content: center;
-}
-
-.spinner {
-  width: 16px; height: 16px; border: 2px solid var(--border2);
-  border-top-color: var(--accent); border-radius: 50%;
-  animation: spin 0.6s linear infinite;
-}
-
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* ── MISC ────────────────────────────────── */
-.empty-state {
-  text-align: center; padding: 48px 20px;
-  font-family: var(--font-mono); font-size: 12px; color: var(--text3);
-}
-
-.empty-state .empty-icon { font-size: 40px; margin-bottom: 12px; opacity: 0.3; }
-
-.filter-row {
-  display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap;
-}
-
-.filter-row input, .filter-row select {
-  max-width: 180px; flex: 1;
-}
-
-.tag { display: inline-block; padding: 2px 8px; font-size: 10px; font-family: var(--font-mono); border-radius: 2px; }
-.tag-ip { background: rgba(0,144,176,0.15); color: var(--accent); }
-.tag-domain { background: rgba(213,0,249,0.12); color: var(--purple); }
-
-.divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
-
-.text-mono { font-family: var(--font-mono); font-size: 12px; }
-.text-dim { color: var(--text3); }
-.text-accent { color: var(--accent); }
-
-.realtime-indicator {
-  display: inline-flex; align-items: center; gap: 6px;
-  font-family: var(--font-mono); font-size: 10px; color: var(--green);
-}
-
-.realtime-indicator::before {
-  content: ''; width: 6px; height: 6px; border-radius: 50%;
-  background: var(--green); animation: pulse 1.5s infinite;
-}
-
-.scroll-table { max-height: 400px; overflow-y: auto; }
-
-/* Scrollbar */
-::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: var(--border2); }
-::-webkit-scrollbar-thumb:hover { background: var(--accent2); }
+:root{--bg:#080c10;--bg2:#0d1218;--surface:#141c26;--border:#1e2d40;--border2:#263545;--text:#c8d8e8;--text2:#7890a8;--text3:#4a6280;--accent:#00e5ff;--accent2:#0090b0;--green:#00e676;--red:#ff1744;--orange:#ff9100;--yellow:#ffd600;--purple:#d500f9;--mono:'Space Mono',monospace;--sans:'Syne',sans-serif;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 4px);pointer-events:none;z-index:9999;}
+#login-page{display:flex;align-items:center;justify-content:center;min-height:100vh;background:radial-gradient(ellipse at 50% 0%,rgba(0,229,255,0.08) 0%,transparent 60%),var(--bg);}
+.login-box{width:420px;border:1px solid var(--border2);background:var(--surface);padding:48px 40px;position:relative;box-shadow:0 0 20px rgba(0,229,255,0.15);}
+.login-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);}
+.login-logo{text-align:center;margin-bottom:32px;}
+.login-logo .icon{font-size:40px;display:block;margin-bottom:12px;filter:drop-shadow(0 0 12px rgba(0,229,255,0.5));}
+.login-logo h1{font-size:20px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--accent);}
+.login-logo p{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:2px;margin-top:4px;}
+.tabs{display:flex;margin-bottom:28px;border-bottom:1px solid var(--border);}
+.tab{flex:1;padding:10px;text-align:center;cursor:pointer;font-family:var(--mono);font-size:11px;letter-spacing:1px;color:var(--text3);border:none;background:none;border-bottom:2px solid transparent;transition:all 0.2s;}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.fg{margin-bottom:18px;}
+.fg label{display:block;font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;margin-bottom:6px;}
+.fg input,.fg select{width:100%;background:var(--bg2);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:13px;padding:11px 14px;outline:none;transition:border-color 0.2s;}
+.fg input:focus,.fg select:focus{border-color:var(--accent);}
+.fg select option{background:var(--bg2);}
+.btn-login{width:100%;padding:14px;background:var(--accent);color:var(--bg);border:none;cursor:pointer;font-family:var(--sans);font-weight:700;font-size:13px;letter-spacing:2px;text-transform:uppercase;box-shadow:0 0 24px rgba(0,229,255,0.3);transition:all 0.2s;}
+.btn-login:hover{background:#33ecff;}
+.btn-login:disabled{opacity:0.5;cursor:not-allowed;}
+.err{color:var(--red);font-family:var(--mono);font-size:12px;text-align:center;margin-top:14px;min-height:18px;}
+.hint{text-align:center;margin-top:16px;font-family:var(--mono);font-size:11px;color:var(--text3);}
+#app{display:none;min-height:100vh;}
+.topbar{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;}
+.topbar-logo{font-family:var(--sans);font-weight:800;font-size:14px;letter-spacing:3px;color:var(--accent);text-transform:uppercase;display:flex;align-items:center;gap:10px;}
+.topbar-status{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;color:var(--green);}
+.topbar-status::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,230,118,0.4);}50%{box-shadow:0 0 0 6px rgba(0,230,118,0);}}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:16px;}
+.uinfo{font-family:var(--mono);font-size:11px;color:var(--text2);display:flex;align-items:center;gap:8px;}
+.rbadge{background:var(--accent2);color:var(--accent);padding:2px 8px;font-size:9px;letter-spacing:2px;text-transform:uppercase;}
+.btn-out{background:none;border:1px solid var(--border);color:var(--text3);font-family:var(--mono);font-size:10px;padding:6px 14px;cursor:pointer;transition:all 0.2s;}
+.btn-out:hover{border-color:var(--red);color:var(--red);}
+.sidebar{position:fixed;top:56px;left:0;bottom:0;width:220px;background:var(--bg2);border-right:1px solid var(--border);padding:20px 0;overflow-y:auto;}
+.nlabel{font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;padding:0 20px 8px;margin-top:16px;}
+.nitem{display:flex;align-items:center;gap:12px;padding:10px 20px;cursor:pointer;transition:all 0.15s;border-left:3px solid transparent;font-size:13px;font-weight:600;color:var(--text2);}
+.nitem:hover{background:var(--surface);color:var(--text);}
+.nitem.active{background:rgba(0,229,255,0.06);color:var(--accent);border-left-color:var(--accent);}
+.nbadge{margin-left:auto;background:var(--red);color:#fff;font-family:var(--mono);font-size:10px;padding:1px 6px;border-radius:10px;}
+.main{margin-left:220px;padding-top:56px;min-height:100vh;}
+.page{display:none;padding:32px;animation:fi 0.3s ease;}
+.page.active{display:block;}
+@keyframes fi{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+.ptitle{font-size:24px;font-weight:800;margin-bottom:4px;}
+.psub{font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:1px;margin-bottom:28px;}
+.sgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px;margin-bottom:28px;}
+.sc{background:var(--surface);border:1px solid var(--border);padding:20px 24px;position:relative;overflow:hidden;}
+.sc::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;}
+.sc.blue::after{background:var(--accent);}
+.sc.green::after{background:var(--green);}
+.sc.red::after{background:var(--red);}
+.sc.orange::after{background:var(--orange);}
+.sc.purple::after{background:var(--purple);}
+.slabel{font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;margin-bottom:10px;}
+.sval{font-family:var(--mono);font-size:32px;font-weight:700;line-height:1;}
+.sval.blue{color:var(--accent);}
+.sval.green{color:var(--green);}
+.sval.red{color:var(--red);}
+.sval.orange{color:var(--orange);}
+.ssub{font-family:var(--mono);font-size:11px;color:var(--text3);margin-top:6px;}
+.sicon{position:absolute;top:16px;right:16px;font-size:28px;opacity:0.15;}
+.panel{background:var(--surface);border:1px solid var(--border);margin-bottom:20px;}
+.ph{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border);background:var(--bg2);}
+.ptit{font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+.pb{padding:20px;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;}
+@media(max-width:900px){.g2{grid-template-columns:1fr;}}
+.tw{overflow-x:auto;max-height:400px;overflow-y:auto;}
+table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12px;}
+thead th{text-align:left;padding:10px 14px;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg2);font-weight:700;}
+tbody tr{border-bottom:1px solid rgba(30,45,64,0.5);transition:background 0.1s;}
+tbody tr:hover{background:rgba(20,28,38,0.6);}
+tbody td{padding:10px 14px;color:var(--text2);vertical-align:middle;}
+.badge{display:inline-flex;align-items:center;padding:3px 10px;font-size:10px;font-family:var(--mono);letter-spacing:1px;font-weight:700;text-transform:uppercase;}
+.badge-allowed{background:rgba(0,230,118,0.12);color:var(--green);}
+.badge-blocked{background:rgba(255,23,68,0.12);color:var(--red);}
+.badge-anomaly{background:rgba(255,145,0,0.12);color:var(--orange);}
+.badge-critical{background:rgba(255,23,68,0.15);color:var(--red);}
+.badge-high{background:rgba(255,145,0,0.15);color:var(--orange);}
+.badge-medium{background:rgba(255,214,0,0.12);color:var(--yellow);}
+.badge-low{background:rgba(0,230,118,0.12);color:var(--green);}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 18px;border:none;cursor:pointer;font-family:var(--sans);font-weight:700;font-size:12px;letter-spacing:1px;text-transform:uppercase;transition:all 0.2s;}
+.bd{background:var(--red);color:#fff;font-size:11px;padding:7px 14px;border:none;cursor:pointer;font-family:var(--sans);font-weight:700;letter-spacing:1px;transition:all 0.2s;}
+.bd:hover{background:#ff4569;}
+.bs{background:var(--green);color:var(--bg);font-size:11px;padding:7px 14px;border:none;cursor:pointer;font-family:var(--sans);font-weight:700;letter-spacing:1px;}
+.bg{background:transparent;border:1px solid var(--border2);color:var(--text2);font-size:11px;padding:7px 14px;cursor:pointer;font-family:var(--sans);font-weight:700;letter-spacing:1px;transition:all 0.2s;}
+.bg:hover{border-color:var(--accent);color:var(--accent);}
+.bw{background:var(--orange);color:var(--bg);font-size:11px;padding:7px 14px;border:none;cursor:pointer;font-family:var(--sans);font-weight:700;letter-spacing:1px;}
+.ig{margin-bottom:16px;}
+.ig label{display:block;font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;margin-bottom:6px;}
+.ig input{width:100%;background:var(--bg2);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:13px;padding:10px 14px;outline:none;transition:border-color 0.2s;}
+.ig input:focus{border-color:var(--accent);}
+.aitem{display:flex;align-items:flex-start;gap:14px;padding:14px 16px;border-bottom:1px solid var(--border);transition:background 0.15s;}
+.aitem:hover{background:rgba(20,28,38,0.5);}
+.aitem:last-child{border-bottom:none;}
+.sdot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+.sdot.critical{background:var(--red);box-shadow:0 0 8px var(--red);}
+.sdot.high{background:var(--orange);}
+.sdot.medium{background:var(--yellow);}
+.sdot.low{background:var(--green);}
+.ac{flex:1;}
+.atit{font-size:13px;font-weight:600;margin-bottom:4px;}
+.amet{font-family:var(--mono);font-size:10px;color:var(--text3);}
+.aact{display:flex;gap:6px;flex-shrink:0;}
+.bchart{display:flex;align-items:flex-end;gap:4px;height:140px;padding:0 4px;}
+.bgroup{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;}
+.bstack{display:flex;flex-direction:column;width:100%;height:120px;justify-content:flex-end;}
+.ballow{background:rgba(0,230,118,0.6);min-height:1px;}
+.bblock{background:rgba(255,23,68,0.7);min-height:1px;}
+.blbl{font-family:var(--mono);font-size:8px;color:var(--text3);}
+#toasts{position:fixed;bottom:24px;right:24px;z-index:9000;display:flex;flex-direction:column;gap:8px;}
+.toast{padding:12px 18px;min-width:280px;font-family:var(--mono);font-size:12px;border-left:3px solid;animation:si 0.3s ease;background:var(--surface);box-shadow:0 8px 32px rgba(0,0,0,0.5);}
+.toast.success{border-color:var(--green);color:var(--green);}
+.toast.error{border-color:var(--red);color:var(--red);}
+.toast.info{border-color:var(--accent);color:var(--accent);}
+.toast.warn{border-color:var(--orange);color:var(--orange);}
+@keyframes si{from{transform:translateX(100%);opacity:0;}to{transform:none;opacity:1;}}
+.loading{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12px;color:var(--text3);padding:20px;justify-content:center;}
+.spin{width:16px;height:16px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:sp 0.6s linear infinite;}
+@keyframes sp{to{transform:rotate(360deg);}}
+.empty{text-align:center;padding:40px;font-family:var(--mono);font-size:12px;color:var(--text3);}
+.live{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;color:var(--green);}
+.live::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite;}
+.fr{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+.fr input,.fr select{background:var(--bg2);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:12px;padding:8px 12px;outline:none;max-width:180px;flex:1;}
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border2);}
 </style>
 </head>
 <body>
 
-<!-- ═══════════════════════════════════════
-     LOGIN PAGE
-═══════════════════════════════════════ -->
 <div id="login-page">
   <div class="login-box">
     <div class="login-logo">
-      <span class="shield">🛡️</span>
+      <span class="icon">🛡️</span>
       <h1>AI Firewall</h1>
-      <p>COMMAND CENTER v1.0</p>
+      <p>COMMAND CENTER v2.0</p>
     </div>
-
-    <div class="login-tabs">
-      <button class="login-tab active" onclick="switchLoginTab('login')">Sign In</button>
-      <button class="login-tab" onclick="switchLoginTab('register')">Register</button>
+    <div class="tabs">
+      <button class="tab active" id="tl">Sign In</button>
+      <button class="tab" id="tr">Register</button>
     </div>
-
-    <!-- Login Form -->
-    <div id="tab-login">
-      <div class="form-group">
-        <label>Email Address</label>
-        <input type="email" id="login-email" placeholder="admin@firewall.io" autocomplete="email">
-      </div>
-      <div class="form-group">
-        <label>Password</label>
-        <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password">
-      </div>
-      <button class="btn btn-primary" id="login-btn" onclick="doLogin()">
-        <span>⚡</span> AUTHENTICATE
-      </button>
-      <div class="login-error" id="login-error"></div>
-      <div class="login-hint">Default: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="d9b8bdb4b0b799bfb0abbcaeb8b5b5f7b0b6">[email&#160;protected]</a> / Admin123</div>
+    <div id="fl">
+      <div class="fg"><label>Email</label><input type="email" id="le" placeholder="admin@firewall.io"></div>
+      <div class="fg"><label>Password</label><input type="password" id="lp" placeholder="••••••••"></div>
+      <button class="btn-login" id="lb">⚡ AUTHENTICATE</button>
+      <div class="err" id="lerr"></div>
+      <div class="hint">Default: admin@firewall.io / Admin123</div>
     </div>
-
-    <!-- Register Form -->
-    <div id="tab-register" style="display:none">
-      <div class="form-group">
-        <label>Username</label>
-        <input type="text" id="reg-username" placeholder="johndoe">
-      </div>
-      <div class="form-group">
-        <label>Email Address</label>
-        <input type="email" id="reg-email" placeholder="john@example.com">
-      </div>
-      <div class="form-group">
-        <label>Password</label>
-        <input type="password" id="reg-password" placeholder="Min 6 chars, 1 number">
-      </div>
-      <div class="form-group">
-        <label>Role</label>
-        <select id="reg-role">
-          <option value="user">User</option>
-          <option value="admin">Admin</option>
-        </select>
-      </div>
-      <button class="btn btn-primary" onclick="doRegister()">
-        <span>➕</span> CREATE ACCOUNT
-      </button>
-      <div class="login-error" id="reg-error"></div>
+    <div id="fr2" style="display:none">
+      <div class="fg"><label>Username</label><input type="text" id="ru"></div>
+      <div class="fg"><label>Email</label><input type="email" id="re"></div>
+      <div class="fg"><label>Password</label><input type="password" id="rp"></div>
+      <div class="fg"><label>Role</label><select id="rr"><option value="user">User</option><option value="admin">Admin</option></select></div>
+      <button class="btn-login" id="rb">➕ CREATE ACCOUNT</button>
+      <div class="err" id="rerr"></div>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════
-     MAIN APP
-═══════════════════════════════════════ -->
 <div id="app">
-  <!-- Topbar -->
   <div class="topbar">
-    <div class="topbar-logo">
-      <span>🛡️</span> AI FIREWALL
-    </div>
-    <div class="topbar-status" id="fw-status">FIREWALL ACTIVE</div>
+    <div class="topbar-logo">🛡️ AI FIREWALL</div>
+    <div class="topbar-status">FIREWALL ACTIVE</div>
     <div class="topbar-right">
-      <div class="topbar-user">
-        <span id="user-display">admin</span>
-        <span class="role-badge" id="role-badge">admin</span>
-      </div>
-      <button class="btn-logout" onclick="doLogout()">LOGOUT</button>
+      <div class="uinfo"><span id="uname">admin</span><span class="rbadge" id="urole">admin</span></div>
+      <button class="btn-out" id="ob">LOGOUT</button>
     </div>
   </div>
-
-  <!-- Sidebar -->
   <div class="sidebar">
-    <div class="nav-section-label">MONITOR</div>
-    <div class="nav-item active" onclick="showPage('dashboard')">
-      <span class="nav-icon">📊</span> Dashboard
-    </div>
-    <div class="nav-item" onclick="showPage('logs')">
-      <span class="nav-icon">📋</span> Request Logs
-    </div>
-    <div class="nav-item" onclick="showPage('alerts')">
-      <span class="nav-icon">⚠️</span> Alerts
-      <span class="nav-badge" id="alert-badge" style="display:none">0</span>
-    </div>
-
-    <div class="nav-section-label">CONTROL</div>
-    <div class="nav-item" onclick="showPage('rules')">
-      <span class="nav-icon">🔧</span> Firewall Rules
-    </div>
-    <div class="nav-item" onclick="showPage('block')">
-      <span class="nav-icon">🚫</span> Block IP / Domain
-    </div>
-
-    <div class="nav-section-label">TOOLS</div>
-    <div class="nav-item" onclick="showPage('simulate')">
-      <span class="nav-icon">🎯</span> Attack Simulator
-    </div>
+    <div class="nlabel">MONITOR</div>
+    <div class="nitem active" data-p="dashboard">📊 Dashboard</div>
+    <div class="nitem" data-p="logs">📋 Logs</div>
+    <div class="nitem" data-p="alerts">⚠️ Alerts <span class="nbadge" id="abadge" style="display:none">0</span></div>
+    <div class="nlabel">CONTROL</div>
+    <div class="nitem" data-p="rules">🔧 Rules</div>
+    <div class="nitem" data-p="block">🚫 Block IP/Domain</div>
+    <div class="nlabel">TOOLS</div>
+    <div class="nitem" data-p="simulate">🎯 Simulator</div>
   </div>
+  <div class="main">
 
-  <!-- Main Content -->
-  <div class="main-content">
-
-    <!-- ── DASHBOARD ── -->
     <div class="page active" id="page-dashboard">
-      <div class="page-header">
-        <div class="page-title">COMMAND CENTER</div>
-        <div class="page-subtitle">REAL-TIME THREAT MONITORING / <span class="realtime-indicator">LIVE</span></div>
+      <div class="ptitle">COMMAND CENTER</div>
+      <div class="psub">REAL-TIME THREAT MONITORING / <span class="live">LIVE</span></div>
+      <div class="sgrid">
+        <div class="sc blue"><div class="slabel">Total Requests (24h)</div><div class="sval blue" id="s1">—</div><div class="ssub" id="s1s">loading...</div><div class="sicon">📡</div></div>
+        <div class="sc green"><div class="slabel">Allowed</div><div class="sval green" id="s2">—</div><div class="ssub" id="s2s">—</div><div class="sicon">✅</div></div>
+        <div class="sc red"><div class="slabel">Blocked</div><div class="sval red" id="s3">—</div><div class="ssub" id="s3s">—</div><div class="sicon">🚫</div></div>
+        <div class="sc orange"><div class="slabel">Anomalies</div><div class="sval orange" id="s4">—</div><div class="ssub">AI detection</div><div class="sicon">🤖</div></div>
+        <div class="sc purple"><div class="slabel">Active Rules</div><div class="sval" id="s5">—</div><div class="ssub">Policies</div><div class="sicon">📜</div></div>
+        <div class="sc red"><div class="slabel">Open Alerts</div><div class="sval red" id="s6">—</div><div class="ssub" id="s6s">— critical</div><div class="sicon">🚨</div></div>
       </div>
-
-      <div class="stats-grid" id="stats-grid">
-        <div class="stat-card blue">
-          <div class="stat-label">Total Requests (24h)</div>
-          <div class="stat-value blue" id="stat-total">—</div>
-          <div class="stat-sub" id="stat-recent">Loading...</div>
-          <div class="stat-icon">📡</div>
-        </div>
-        <div class="stat-card green">
-          <div class="stat-label">Allowed Requests</div>
-          <div class="stat-value green" id="stat-allowed">—</div>
-          <div class="stat-sub" id="stat-allow-rate">—</div>
-          <div class="stat-icon">✅</div>
-        </div>
-        <div class="stat-card red">
-          <div class="stat-label">Blocked Requests</div>
-          <div class="stat-value red" id="stat-blocked">—</div>
-          <div class="stat-sub" id="stat-block-rate">—</div>
-          <div class="stat-icon">🚫</div>
-        </div>
-        <div class="stat-card orange">
-          <div class="stat-label">Anomalies Detected</div>
-          <div class="stat-value orange" id="stat-anomaly">—</div>
-          <div class="stat-sub">AI detection engine</div>
-          <div class="stat-icon">🤖</div>
-        </div>
-        <div class="stat-card purple">
-          <div class="stat-label">Active Rules</div>
-          <div class="stat-value" id="stat-rules">—</div>
-          <div class="stat-sub">Firewall policies</div>
-          <div class="stat-icon">📜</div>
-        </div>
-        <div class="stat-card red">
-          <div class="stat-label">Open Alerts</div>
-          <div class="stat-value red" id="stat-alerts">—</div>
-          <div class="stat-sub" id="stat-critical">— critical</div>
-          <div class="stat-icon">🚨</div>
-        </div>
+      <div class="g2">
+        <div class="panel"><div class="ph"><div class="ptit">📈 Traffic (12h)</div><div style="font-family:var(--mono);font-size:10px;color:var(--text3)"><span style="color:var(--green)">■</span> allowed <span style="color:var(--red);margin-left:8px">■</span> blocked</div></div><div class="pb"><div class="bchart" id="chart"><div class="loading"><div class="spin"></div>Loading...</div></div></div></div>
+        <div class="panel"><div class="ph"><div class="ptit">🎯 Top Blocked IPs</div></div><div class="pb" id="tipbox"><div class="loading"><div class="spin"></div>Loading...</div></div></div>
       </div>
-
-      <div class="grid-2">
-        <!-- Traffic Chart -->
-        <div class="panel">
-          <div class="panel-header">
-            <div class="panel-title">📈 Traffic (Last 12h)</div>
-            <div style="font-family:var(--font-mono);font-size:10px;color:var(--text3)">
-              <span style="color:var(--green)">■</span> allowed
-              <span style="color:var(--red);margin-left:8px">■</span> blocked
-            </div>
-          </div>
-          <div class="panel-body">
-            <div class="chart-container">
-              <div class="bar-chart" id="traffic-chart">
-                <div class="loading"><div class="spinner"></div> Loading chart...</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Top Blocked IPs -->
-        <div class="panel">
-          <div class="panel-header">
-            <div class="panel-title">🎯 Top Blocked IPs</div>
-            <button class="btn btn-ghost" onclick="showPage('rules')">Manage Rules →</button>
-          </div>
-          <div class="panel-body" id="top-ips">
-            <div class="loading"><div class="spinner"></div> Loading...</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Recent Alerts -->
-      <div class="panel">
-        <div class="panel-header">
-          <div class="panel-title">🚨 Recent Alerts</div>
-          <button class="btn btn-ghost" onclick="showPage('alerts')">View All →</button>
-        </div>
-        <div id="recent-alerts-list">
-          <div class="loading"><div class="spinner"></div> Loading...</div>
-        </div>
-      </div>
+      <div class="panel"><div class="ph"><div class="ptit">🚨 Recent Alerts</div><button class="bg" id="vab">View All →</button></div><div id="rabox"><div class="loading"><div class="spin"></div>Loading...</div></div></div>
     </div>
 
-    <!-- ── LOGS PAGE ── -->
     <div class="page" id="page-logs">
-      <div class="page-header">
-        <div class="page-title">REQUEST LOGS</div>
-        <div class="page-subtitle">ALL INCOMING TRAFFIC / REAL-TIME AUDIT TRAIL</div>
-      </div>
-
+      <div class="ptitle">REQUEST LOGS</div>
+      <div class="psub">ALL TRAFFIC / AUDIT TRAIL</div>
       <div class="panel">
-        <div class="panel-header">
-          <div class="panel-title">📋 Traffic Log</div>
-          <div style="display:flex;gap:8px;align-items:center">
-            <span class="realtime-indicator">LIVE</span>
-            <button class="btn btn-ghost" onclick="loadLogs()">↻ Refresh</button>
-          </div>
-        </div>
-        <div class="panel-body">
-          <div class="filter-row">
-            <input type="text" id="log-filter-ip" placeholder="Filter by IP..." oninput="filterLogs()">
-            <select id="log-filter-status" onchange="filterLogs()">
-              <option value="">All Status</option>
-              <option value="allowed">Allowed</option>
-              <option value="blocked">Blocked</option>
-              <option value="anomaly">Anomaly</option>
-              <option value="rate_limited">Rate Limited</option>
-            </select>
-            <select id="log-filter-anomaly" onchange="filterLogs()">
-              <option value="">All Traffic</option>
-              <option value="true">Anomalies Only</option>
-            </select>
-            <button class="btn btn-ghost" onclick="exportLogs()">⬇ Export CSV</button>
-          </div>
-          <div class="table-wrap scroll-table">
-            <table>
-              <thead>
-                <tr>
-                  <th>Timestamp</th>
-                  <th>IP Address</th>
-                  <th>Method</th>
-                  <th>Endpoint</th>
-                  <th>Status</th>
-                  <th>Code</th>
-                  <th>Response</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody id="logs-table-body">
-                <tr><td colspan="8"><div class="loading"><div class="spinner"></div> Loading logs...</div></td></tr>
-              </tbody>
-            </table>
-          </div>
-          <div id="logs-pagination" style="margin-top:12px;font-family:var(--font-mono);font-size:11px;color:var(--text3)"></div>
+        <div class="ph"><div class="ptit">📋 Traffic Log</div><div style="display:flex;gap:8px;align-items:center"><span class="live">LIVE</span><button class="bg" id="rlb">↻ Refresh</button><button class="bg" id="elb">⬇ Export</button></div></div>
+        <div class="pb">
+          <div class="fr"><input type="text" id="lip" placeholder="Filter IP..."><select id="lst"><option value="">All</option><option value="allowed">Allowed</option><option value="blocked">Blocked</option><option value="anomaly">Anomaly</option></select></div>
+          <div class="tw"><table><thead><tr><th>Time</th><th>IP</th><th>Method</th><th>Endpoint</th><th>Status</th><th>Code</th><th>ms</th><th>Action</th></tr></thead><tbody id="ltbody"><tr><td colspan="8"><div class="loading"><div class="spin"></div>Loading...</div></td></tr></tbody></table></div>
+          <div id="linfo" style="margin-top:10px;font-family:var(--mono);font-size:11px;color:var(--text3)"></div>
         </div>
       </div>
     </div>
 
-    <!-- ── ALERTS PAGE ── -->
     <div class="page" id="page-alerts">
-      <div class="page-header">
-        <div class="page-title">ANOMALY ALERTS</div>
-        <div class="page-subtitle">AI-POWERED THREAT DETECTION / SUSPICIOUS ACTIVITY</div>
-      </div>
-
+      <div class="ptitle">ANOMALY ALERTS</div>
+      <div class="psub">AI-POWERED THREAT DETECTION</div>
       <div class="panel">
-        <div class="panel-header">
-          <div class="panel-title">🚨 Alert Feed</div>
-          <div style="display:flex;gap:8px">
-            <select id="alert-filter-severity" onchange="loadAlerts()" style="max-width:140px">
-              <option value="">All Severities</option>
-              <option value="critical">Critical</option>
-              <option value="high">High</option>
-              <option value="medium">Medium</option>
-              <option value="low">Low</option>
-            </select>
-            <select id="alert-filter-resolved" onchange="loadAlerts()" style="max-width:140px">
-              <option value="false">Unresolved</option>
-              <option value="true">Resolved</option>
-              <option value="all">All</option>
-            </select>
-            <button class="btn btn-ghost" onclick="loadAlerts()">↻ Refresh</button>
-          </div>
-        </div>
-        <div id="alerts-list">
-          <div class="loading"><div class="spinner"></div> Loading alerts...</div>
-        </div>
+        <div class="ph"><div class="ptit">🚨 Alert Feed</div><div style="display:flex;gap:8px"><select id="asev" style="background:var(--bg2);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:11px;padding:6px 10px;outline:none"><option value="">All</option><option value="critical">Critical</option><option value="high">High</option><option value="medium">Medium</option></select><button class="bg" id="rab">↻ Refresh</button></div></div>
+        <div id="albox"><div class="loading"><div class="spin"></div>Loading...</div></div>
       </div>
     </div>
 
-    <!-- ── RULES PAGE ── -->
     <div class="page" id="page-rules">
-      <div class="page-header">
-        <div class="page-title">FIREWALL RULES</div>
-        <div class="page-subtitle">ACTIVE POLICIES / IP & DOMAIN CONTROL</div>
-      </div>
-
-      <div class="grid-2">
-        <div class="panel">
-          <div class="panel-header"><div class="panel-title">🔴 Blocked IPs</div></div>
-          <div class="panel-body" id="blocked-ips-list">
-            <div class="loading"><div class="spinner"></div></div>
-          </div>
-        </div>
-        <div class="panel">
-          <div class="panel-header"><div class="panel-title">🔴 Blocked Domains</div></div>
-          <div class="panel-body" id="blocked-domains-list">
-            <div class="loading"><div class="spinner"></div></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-header"><div class="panel-title">📜 All Active Rules</div></div>
-        <div class="panel-body">
-          <div class="table-wrap scroll-table">
-            <table>
-              <thead>
-                <tr>
-                  <th>Type</th>
-                  <th>Value</th>
-                  <th>Action</th>
-                  <th>Reason</th>
-                  <th>Hits</th>
-                  <th>Last Triggered</th>
-                  <th>Created</th>
-                  <th>Remove</th>
-                </tr>
-              </thead>
-              <tbody id="rules-table-body">
-                <tr><td colspan="8"><div class="loading"><div class="spinner"></div> Loading...</div></td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+      <div class="ptitle">FIREWALL RULES</div>
+      <div class="psub">ACTIVE POLICIES</div>
+      <div class="panel"><div class="ph"><div class="ptit">📜 Active Rules</div><button class="bg" id="rrb">↻ Refresh</button></div><div class="pb"><div class="tw"><table><thead><tr><th>Type</th><th>Value</th><th>Reason</th><th>Hits</th><th>Created</th><th>Remove</th></tr></thead><tbody id="rtbody"><tr><td colspan="6"><div class="loading"><div class="spin"></div>Loading...</div></td></tr></tbody></table></div></div></div>
     </div>
 
-    <!-- ── BLOCK PAGE ── -->
     <div class="page" id="page-block">
-      <div class="page-header">
-        <div class="page-title">BLOCK IP / DOMAIN</div>
-        <div class="page-subtitle">ADD FIREWALL RULES / CENTRALIZED POLICY MANAGEMENT</div>
+      <div class="ptitle">BLOCK IP / DOMAIN</div>
+      <div class="psub">ADD FIREWALL RULES</div>
+      <div class="g2">
+        <div class="panel"><div class="ph"><div class="ptit">🚫 Block IP</div></div><div class="pb"><div class="ig"><label>IP Address</label><input type="text" id="bip" placeholder="192.168.1.100"></div><div class="ig"><label>Reason</label><input type="text" id="bipr" placeholder="Suspicious..."></div><button class="bd" style="width:100%" id="sibtn">🚫 BLOCK IP</button></div></div>
+        <div class="panel"><div class="ph"><div class="ptit">🌐 Block Domain</div></div><div class="pb"><div class="ig"><label>Domain</label><input type="text" id="bdom" placeholder="malicious.com"></div><div class="ig"><label>Reason</label><input type="text" id="bdomr" placeholder="Phishing..."></div><button class="bd" style="width:100%;margin-top:20px" id="sdbtn">🌐 BLOCK DOMAIN</button></div></div>
       </div>
-
-      <div class="grid-2">
-        <div class="panel">
-          <div class="panel-header"><div class="panel-title">🚫 Block IP Address</div></div>
-          <div class="panel-body">
-            <div class="input-group" style="margin-bottom:16px">
-              <label>IP Address</label>
-              <input type="text" id="block-ip-input" placeholder="e.g. 192.168.1.100">
-            </div>
-            <div class="input-group" style="margin-bottom:16px">
-              <label>Reason (optional)</label>
-              <input type="text" id="block-ip-reason" placeholder="Suspicious activity, DDoS...">
-            </div>
-            <div class="input-group" style="margin-bottom:20px">
-              <label>Expires (optional)</label>
-              <input type="datetime-local" id="block-ip-expires">
-            </div>
-            <button class="btn btn-danger" style="width:100%" onclick="submitBlockIP()">
-              🚫 BLOCK IP ADDRESS
-            </button>
-          </div>
-        </div>
-
-        <div class="panel">
-          <div class="panel-header"><div class="panel-title">🌐 Block Domain</div></div>
-          <div class="panel-body">
-            <div class="input-group" style="margin-bottom:16px">
-              <label>Domain Name</label>
-              <input type="text" id="block-domain-input" placeholder="e.g. malicious.com">
-            </div>
-            <div class="input-group" style="margin-bottom:36px">
-              <label>Reason (optional)</label>
-              <input type="text" id="block-domain-reason" placeholder="Phishing, malware...">
-            </div>
-            <button class="btn btn-danger" style="width:100%;margin-top:20px" onclick="submitBlockDomain()">
-              🌐 BLOCK DOMAIN
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-header"><div class="panel-title">⚡ Quick Block Presets</div></div>
-        <div class="panel-body">
-          <p style="font-family:var(--font-mono);font-size:11px;color:var(--text3);margin-bottom:16px">
-            Common threat IPs for testing. Click to populate the form.
-          </p>
-          <div style="display:flex;flex-wrap:wrap;gap:8px">
-            <button class="btn btn-ghost" onclick="quickBlock('10.0.0.1','Demo attacker IP')">10.0.0.1</button>
-            <button class="btn btn-ghost" onclick="quickBlock('172.16.0.10','Brute force source')">172.16.0.10</button>
-            <button class="btn btn-ghost" onclick="quickBlock('192.168.1.50','Port scanner')">192.168.1.50</button>
-            <button class="btn btn-ghost" onclick="quickBlock('203.0.113.42','SQLi source')">203.0.113.42</button>
-            <button class="btn btn-ghost" onclick="quickBlockDomain('malicious.com','Malware C2')">malicious.com</button>
-            <button class="btn btn-ghost" onclick="quickBlockDomain('phishing.net','Phishing site')">phishing.net</button>
-          </div>
-        </div>
-      </div>
+      <div class="panel"><div class="ph"><div class="ptit">⚡ Quick Block</div></div><div class="pb" style="display:flex;flex-wrap:wrap;gap:8px">
+        <button class="bg qip" data-ip="10.0.0.1" data-r="Demo attacker">10.0.0.1</button>
+        <button class="bg qip" data-ip="172.16.0.10" data-r="Brute force">172.16.0.10</button>
+        <button class="bg qip" data-ip="192.168.1.50" data-r="Port scanner">192.168.1.50</button>
+        <button class="bg qip" data-ip="203.0.113.42" data-r="SQLi source">203.0.113.42</button>
+        <button class="bg qdom" data-d="evil.com" data-r="Malware C2">evil.com</button>
+        <button class="bg qdom" data-d="phish.net" data-r="Phishing">phish.net</button>
+      </div></div>
     </div>
 
-    <!-- ── SIMULATE PAGE ── -->
     <div class="page" id="page-simulate">
-      <div class="page-header">
-        <div class="page-title">ATTACK SIMULATOR</div>
-        <div class="page-subtitle">DEMO MODE / TEST FIREWALL RESPONSE</div>
-      </div>
-
-      <div class="panel" style="border-color:var(--orange);box-shadow:0 0 20px rgba(255,145,0,0.1)">
-        <div class="panel-header" style="background:rgba(255,145,0,0.05)">
-          <div class="panel-title" style="color:var(--orange)">⚠️ Simulation Environment</div>
-          <span style="font-family:var(--font-mono);font-size:10px;color:var(--text3)">DEV MODE ONLY</span>
-        </div>
-        <div class="panel-body">
-          <p style="font-family:var(--font-mono);font-size:12px;color:var(--text2);margin-bottom:20px;line-height:1.8">
-            Simulate various attack scenarios against the firewall. Each simulation generates logs and alerts visible in the dashboard.
-            Responses are handled by the real anomaly detection engine.
-          </p>
-          <div class="grid-3">
-            <div class="panel" style="cursor:pointer" onclick="runSimulation('burst')">
-              <div class="panel-header"><div class="panel-title">💥 Burst Traffic</div></div>
-              <div class="panel-body">
-                <p class="text-mono text-dim">Sends 25 rapid requests from one IP to trigger burst anomaly detection.</p>
-                <button class="btn btn-warn" style="margin-top:12px;width:100%">RUN SIMULATION</button>
-              </div>
-            </div>
-            <div class="panel" style="cursor:pointer" onclick="runSimulation('ddos')">
-              <div class="panel-header"><div class="panel-title">🌊 DDoS Flood</div></div>
-              <div class="panel-body">
-                <p class="text-mono text-dim">Floods with 55+ requests to trigger DDoS detection and auto-block.</p>
-                <button class="btn btn-danger" style="margin-top:12px;width:100%">RUN SIMULATION</button>
-              </div>
-            </div>
-            <div class="panel" onclick="runSimulation('brute')">
-              <div class="panel-header"><div class="panel-title">🔑 Brute Force</div></div>
-              <div class="panel-body">
-                <p class="text-mono text-dim">Simulates repeated failed login attempts to trigger auth anomaly.</p>
-                <button class="btn btn-warn" style="margin-top:12px;width:100%">RUN SIMULATION</button>
-              </div>
-            </div>
+      <div class="ptitle">ATTACK SIMULATOR</div>
+      <div class="psub">TEST FIREWALL RESPONSE</div>
+      <div class="panel" style="border-color:var(--orange)">
+        <div class="ph" style="background:rgba(255,145,0,0.05)"><div class="ptit" style="color:var(--orange)">⚠️ Simulations</div></div>
+        <div class="pb">
+          <div class="g2" style="margin-bottom:0">
+            <div class="panel"><div class="ph"><div class="ptit">💥 Burst Traffic</div></div><div class="pb"><p style="font-family:var(--mono);font-size:11px;color:var(--text2);margin-bottom:12px">25 requests — burst anomaly detection</p><button class="bw simb" data-t="burst" style="width:100%">RUN</button></div></div>
+            <div class="panel"><div class="ph"><div class="ptit">🌊 DDoS Flood</div></div><div class="pb"><p style="font-family:var(--mono);font-size:11px;color:var(--text2);margin-bottom:12px">55 requests — DDoS detection + auto-block</p><button class="bd simb" data-t="ddos" style="width:100%">RUN</button></div></div>
           </div>
-
-          <div id="sim-output" style="display:none;margin-top:20px">
-            <div class="panel-header" style="background:var(--bg2)">
-              <div class="panel-title">📟 Simulation Output</div>
-            </div>
-            <div style="background:var(--bg);padding:16px;font-family:var(--font-mono);font-size:12px;color:var(--green);line-height:2;max-height:200px;overflow-y:auto" id="sim-log"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-header"><div class="panel-title">📖 CLI Simulator Instructions</div></div>
-        <div class="panel-body">
-          <p style="font-family:var(--font-mono);font-size:12px;color:var(--text2);line-height:2">
-            Run these commands from the project root:
-          </p>
-          <div style="background:var(--bg);padding:16px;margin-top:12px;font-family:var(--font-mono);font-size:12px;color:var(--accent);line-height:2.2;border-left:2px solid var(--accent)">
-            $ node scripts/simulate-attack.js all<br>
-            $ node scripts/simulate-attack.js burst<br>
-            $ node scripts/simulate-attack.js ddos<br>
-            $ node scripts/simulate-attack.js scan<br>
-            $ node scripts/simulate-attack.js brute<br>
-            $ node scripts/simulate-attack.js sqli<br>
-            $ node scripts/simulate-attack.js blocked
-          </div>
+          <div id="sout" style="display:none;margin-top:16px;background:var(--bg);padding:16px;font-family:var(--mono);font-size:12px;color:var(--green);line-height:2;border-left:2px solid var(--accent);white-space:pre"></div>
         </div>
       </div>
     </div>
 
-  </div><!-- /main-content -->
-</div><!-- /app -->
+  </div>
+</div>
+<div id="toasts"></div>
 
-<div id="toast-container"></div>
-
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-// ═══════════════════════════════════════
-//   CONFIGURATION
-// ═══════════════════════════════════════
+<script>
 const API = 'https://firewall-v2.onrender.com';
 let token = localStorage.getItem('fw_token');
-let currentUser = JSON.parse(localStorage.getItem('fw_user') || 'null');
-let logsData = [];
-let refreshInterval = null;
+let user = JSON.parse(localStorage.getItem('fw_user') || 'null');
+let logsCache = [];
 
-// ═══════════════════════════════════════
-//   UTILITIES
-// ═══════════════════════════════════════
 const $ = id => document.getElementById(id);
+const fmt = n => n != null ? Number(n).toLocaleString() : '—';
 
-function toast(msg, type = 'info', duration = 3500) {
+function toast(msg, type) {
   const el = document.createElement('div');
-  el.className = `toast ${type}`;
+  el.className = 'toast ' + (type||'info');
   el.textContent = msg;
-  $('toast-container').appendChild(el);
-  setTimeout(() => el.remove(), duration);
+  $('toasts').appendChild(el);
+  setTimeout(() => el.remove(), 3500);
 }
-
-function fmt(num) { return num != null ? Number(num).toLocaleString() : '—'; }
 
 function timeAgo(iso) {
   if (!iso) return '—';
-  const diff = (Date.now() - new Date(iso)) / 1000;
-  if (diff < 60) return `${Math.floor(diff)}s ago`;
-  if (diff < 3600) return `${Math.floor(diff/60)}m ago`;
-  if (diff < 86400) return `${Math.floor(diff/3600)}h ago`;
-  return new Date(iso).toLocaleDateString();
+  const d = (Date.now() - new Date(iso)) / 1000;
+  if (d < 60) return Math.floor(d) + 's ago';
+  if (d < 3600) return Math.floor(d/60) + 'm ago';
+  return Math.floor(d/3600) + 'h ago';
 }
 
-function fmtTime(iso) {
+function fmtT(iso) {
   if (!iso) return '—';
-  return new Date(iso).toLocaleTimeString('en-US', { hour12: false });
+  return new Date(iso).toLocaleTimeString('en-US', {hour12:false});
 }
 
-function fmtDateTime(iso) {
-  if (!iso) return '—';
-  return new Date(iso).toLocaleString();
-}
-
-async function api(path, method = 'GET', body = null) {
+async function api(path, method, body) {
   try {
-    const opts = {
-      method,
-      headers: { 'Content-Type': 'application/json' },
-    };
-    if (token) opts.headers['Authorization'] = `Bearer ${token}`;
+    const opts = {method: method||'GET', headers: {'Content-Type':'application/json'}};
+    if (token) opts.headers['Authorization'] = 'Bearer ' + token;
     if (body) opts.body = JSON.stringify(body);
-
     const res = await fetch(API + path, opts);
     const data = await res.json();
-
-    if (res.status === 401) {
-      doLogout();
-      return null;
-    }
-    return { ok: res.ok, status: res.status, data };
-  } catch (err) {
-    toast('⚠️ Server unreachable. Is the backend running?', 'error');
+    if (res.status === 401) { logout(); return null; }
+    return {ok: res.ok, data};
+  } catch(e) {
+    toast('Server unreachable', 'error');
     return null;
   }
 }
 
-// ═══════════════════════════════════════
-//   AUTH
-// ═══════════════════════════════════════
-function switchLoginTab(tab) {
-  document.querySelectorAll('.login-tab').forEach((t, i) => {
-    t.classList.toggle('active', (i === 0 && tab === 'login') || (i === 1 && tab === 'register'));
-  });
-  $('tab-login').style.display = tab === 'login' ? '' : 'none';
-  $('tab-register').style.display = tab === 'register' ? '' : 'none';
-}
+// LOGIN
+$('tl').onclick = function() {
+  $('tl').classList.add('active'); $('tr').classList.remove('active');
+  $('fl').style.display = ''; $('fr2').style.display = 'none';
+};
+$('tr').onclick = function() {
+  $('tr').classList.add('active'); $('tl').classList.remove('active');
+  $('fr2').style.display = ''; $('fl').style.display = 'none';
+};
 
-async function doLogin() {
-  const email = $('login-email').value.trim();
-  const password = $('login-password').value;
-  $('login-error').textContent = '';
-  $('login-btn').disabled = true;
-  $('login-btn').innerHTML = '<div class="spinner"></div> Authenticating...';
-
-  const res = await api('/auth/login', 'POST', { email, password });
-
-  $('login-btn').disabled = false;
-  $('login-btn').innerHTML = '<span>⚡</span> AUTHENTICATE';
-
-  if (!res || !res.ok) {
-    $('login-error').textContent = res?.data?.message || 'Authentication failed';
-    return;
-  }
-
+$('lb').onclick = async function() {
+  const email = $('le').value.trim();
+  const pass = $('lp').value;
+  $('lerr').textContent = '';
+  $('lb').disabled = true;
+  $('lb').textContent = 'Authenticating...';
+  const res = await api('/auth/login', 'POST', {email, password: pass});
+  $('lb').disabled = false;
+  $('lb').textContent = '⚡ AUTHENTICATE';
+  if (!res || !res.ok) { $('lerr').textContent = res?.data?.message || 'Login failed'; return; }
   token = res.data.data.token;
-  currentUser = res.data.data.user;
+  user = res.data.data.user;
   localStorage.setItem('fw_token', token);
-  localStorage.setItem('fw_user', JSON.stringify(currentUser));
+  localStorage.setItem('fw_user', JSON.stringify(user));
   initApp();
-}
+};
 
-async function doRegister() {
-  const username = $('reg-username').value.trim();
-  const email = $('reg-email').value.trim();
-  const password = $('reg-password').value;
-  const role = $('reg-role').value;
-  $('reg-error').textContent = '';
-
-  const res = await api('/auth/register', 'POST', { username, email, password, role });
-
-  if (!res || !res.ok) {
-    $('reg-error').textContent = res?.data?.message || 'Registration failed';
-    return;
-  }
-
+$('rb').onclick = async function() {
+  const username = $('ru').value.trim();
+  const email = $('re').value.trim();
+  const password = $('rp').value;
+  const role = $('rr').value;
+  $('rerr').textContent = '';
+  const res = await api('/auth/register', 'POST', {username, email, password, role});
+  if (!res || !res.ok) { $('rerr').textContent = res?.data?.message || 'Failed'; return; }
   token = res.data.data.token;
-  currentUser = res.data.data.user;
+  user = res.data.data.user;
   localStorage.setItem('fw_token', token);
-  localStorage.setItem('fw_user', JSON.stringify(currentUser));
-  toast('✅ Account created!', 'success');
+  localStorage.setItem('fw_user', JSON.stringify(user));
+  toast('Account created!', 'success');
   initApp();
-}
+};
 
-function doLogout() {
-  token = null; currentUser = null;
+$('lp').addEventListener('keydown', function(e) { if (e.key === 'Enter') $('lb').click(); });
+
+function logout() {
+  token = null; user = null;
   localStorage.removeItem('fw_token');
   localStorage.removeItem('fw_user');
-  clearInterval(refreshInterval);
   $('app').style.display = 'none';
   $('login-page').style.display = 'flex';
 }
+$('ob').onclick = logout;
 
-// ═══════════════════════════════════════
-//   APP INIT
-// ═══════════════════════════════════════
 function initApp() {
   $('login-page').style.display = 'none';
   $('app').style.display = '';
-
-  if (currentUser) {
-    $('user-display').textContent = currentUser.username || 'user';
-    $('role-badge').textContent = currentUser.role || 'user';
-  }
-
+  if (user) { $('uname').textContent = user.username; $('urole').textContent = user.role; }
   showPage('dashboard');
-
-  // Auto-refresh every 15 seconds
-  clearInterval(refreshInterval);
-  refreshInterval = setInterval(() => {
-    if (document.getElementById('page-dashboard').classList.contains('active')) {
-      loadDashboard();
-    }
+  setInterval(function() {
+    if ($('page-dashboard').classList.contains('active')) loadDash();
   }, 15000);
 }
 
-// Auto-login if token exists
-window.addEventListener('DOMContentLoaded', () => {
-  if (token && currentUser) {
-    initApp();
-  }
+if (token && user) initApp();
+
+// NAV
+document.querySelectorAll('.nitem').forEach(function(item) {
+  item.onclick = function() { showPage(item.dataset.p); };
 });
 
-// ═══════════════════════════════════════
-//   NAVIGATION
-// ═══════════════════════════════════════
+$('vab').onclick = function() { showPage('alerts'); };
+
 function showPage(name) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-
-  $(`page-${name}`).classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(n => {
-    if (n.textContent.toLowerCase().includes(name === 'block' ? 'block' : name)) {
-      n.classList.add('active');
-    }
-  });
-
-  // Load data for the page
-  const loaders = {
-    dashboard: loadDashboard,
-    logs: loadLogs,
-    alerts: loadAlerts,
-    rules: loadRules,
-  };
-  if (loaders[name]) loaders[name]();
+  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+  document.querySelectorAll('.nitem').forEach(function(n) { n.classList.remove('active'); });
+  $('page-' + name).classList.add('active');
+  document.querySelectorAll('.nitem').forEach(function(n) { if (n.dataset.p === name) n.classList.add('active'); });
+  if (name === 'dashboard') loadDash();
+  if (name === 'logs') loadLogs();
+  if (name === 'alerts') loadAlerts();
+  if (name === 'rules') loadRules();
 }
 
-// ═══════════════════════════════════════
-//   DASHBOARD
-// ═══════════════════════════════════════
-async function loadDashboard() {
+// DASHBOARD
+async function loadDash() {
   const res = await api('/admin/stats');
-  if (!res?.ok) return;
-
-  const { summary, topBlockedIPs, trafficByHour, realtime } = res.data.data;
-
-  // Stats
-  $('stat-total').textContent = fmt(summary.totalRequests);
-  $('stat-allowed').textContent = fmt(summary.allowedRequests);
-  $('stat-allow-rate').textContent = `${(100 - summary.blockRate).toFixed(1)}% pass rate`;
-  $('stat-blocked').textContent = fmt(summary.blockedRequests);
-  $('stat-block-rate').textContent = `${summary.blockRate}% block rate`;
-  $('stat-anomaly').textContent = fmt(summary.anomalyRequests);
-  $('stat-rules').textContent = fmt(summary.activeRules);
-  $('stat-alerts').textContent = fmt(summary.unresolvedAlerts);
-  $('stat-critical').textContent = `${summary.criticalAlerts} critical`;
-  $('stat-recent').textContent = `${summary.recentRequests} in last hour`;
-
-  // Alert badge
-  if (summary.unresolvedAlerts > 0) {
-    $('alert-badge').textContent = summary.unresolvedAlerts;
-    $('alert-badge').style.display = '';
-  }
-
-  renderTrafficChart(trafficByHour);
-  renderTopIPs(topBlockedIPs);
+  if (!res || !res.ok) return;
+  const d = res.data.data;
+  const s = d.summary;
+  $('s1').textContent = fmt(s.totalRequests);
+  $('s2').textContent = fmt(s.allowedRequests);
+  $('s2s').textContent = (100 - s.blockRate).toFixed(1) + '% pass rate';
+  $('s3').textContent = fmt(s.blockedRequests);
+  $('s3s').textContent = s.blockRate + '% block rate';
+  $('s4').textContent = fmt(s.anomalyRequests);
+  $('s5').textContent = fmt(s.activeRules);
+  $('s6').textContent = fmt(s.unresolvedAlerts);
+  $('s6s').textContent = s.criticalAlerts + ' critical';
+  $('s1s').textContent = s.recentRequests + ' in last hour';
+  if (s.unresolvedAlerts > 0) { $('abadge').textContent = s.unresolvedAlerts; $('abadge').style.display = ''; }
+  renderChart(d.trafficByHour);
+  renderTopIPs(d.topBlockedIPs);
   loadRecentAlerts();
 }
 
-function renderTrafficChart(data) {
-  const el = $('traffic-chart');
-  if (!data || data.length === 0) {
-    el.innerHTML = '<div class="empty-state"><div>No traffic data yet</div></div>';
-    return;
-  }
-
-  const maxVal = Math.max(...data.map(d => (d.total || 0)), 1);
-  el.innerHTML = data.map(d => `
-    <div class="bar-group">
-      <div class="bar-stack">
-        <div class="bar-blocked" style="height:${((d.blocked||0)/maxVal*120)}px" title="Blocked: ${d.blocked||0}"></div>
-        <div class="bar-allowed" style="height:${((d.allowed||0)/maxVal*120)}px" title="Allowed: ${d.allowed||0}"></div>
-      </div>
-      <div class="bar-label">${d._id || ''}</div>
-    </div>
-  `).join('');
+function renderChart(data) {
+  const el = $('chart');
+  if (!data || !data.length) { el.innerHTML = '<div class="empty">No data yet</div>'; return; }
+  const max = Math.max.apply(null, data.map(function(d) { return d.total || 0; }).concat([1]));
+  el.innerHTML = data.map(function(d) {
+    return '<div class="bgroup"><div class="bstack"><div class="bblock" style="height:' + ((d.blocked||0)/max*110) + 'px"></div><div class="ballow" style="height:' + ((d.allowed||0)/max*110) + 'px"></div></div><div class="blbl">' + (d._id||'') + '</div></div>';
+  }).join('');
 }
 
 function renderTopIPs(ips) {
-  const el = $('top-ips');
-  if (!ips || ips.length === 0) {
-    el.innerHTML = '<div class="empty-state"><div class="empty-icon">🛡️</div>No blocked traffic yet</div>';
-    return;
-  }
-  const max = ips[0]?.count || 1;
-  el.innerHTML = ips.map((item, i) => `
-    <div class="ip-rank-item">
-      <div class="ip-rank-num">#${i+1}</div>
-      <div class="ip-rank-ip">${item.ip}</div>
-      <div class="ip-rank-bar-wrap"><div class="ip-rank-bar" style="width:${(item.count/max*100)}%"></div></div>
-      <div class="ip-rank-count">${item.count}</div>
-      <button class="btn btn-danger" onclick="quickBlock('${item.ip}','Blocked from dashboard')">Block</button>
-    </div>
-  `).join('');
+  const el = $('tipbox');
+  if (!ips || !ips.length) { el.innerHTML = '<div class="empty">🛡️ No blocked traffic yet</div>'; return; }
+  const max = ips[0] ? ips[0].count : 1;
+  el.innerHTML = ips.map(function(item, i) {
+    return '<div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid rgba(30,45,64,0.4)">' +
+      '<div style="font-family:var(--mono);font-size:11px;color:var(--text3);width:20px">#' + (i+1) + '</div>' +
+      '<div style="font-family:var(--mono);font-size:12px;color:var(--accent);flex:1">' + item.ip + '</div>' +
+      '<div style="width:80px;height:6px;background:var(--border)"><div style="height:100%;background:var(--red);width:' + (item.count/max*100) + '%"></div></div>' +
+      '<div style="font-family:var(--mono);font-size:11px;color:var(--red);width:30px">' + item.count + '</div>' +
+      '<button class="bd" style="font-size:10px;padding:4px 10px" onclick="blockIP(\'' + item.ip + '\',\'Dashboard block\')">Block</button></div>';
+  }).join('');
 }
 
 async function loadRecentAlerts() {
-  const res = await api('/admin/alerts?limit=5&isResolved=false');
-  if (!res?.ok) return;
-  const alerts = res.data.data.alerts;
-  renderAlertsList(alerts, 'recent-alerts-list', true);
+  const res = await api('/admin/alerts?isResolved=false');
+  if (!res || !res.ok) return;
+  renderAlerts(res.data.data.alerts.slice(0,5), 'rabox', true);
 }
 
-// ═══════════════════════════════════════
-//   LOGS
-// ═══════════════════════════════════════
+// LOGS
 async function loadLogs() {
-  const status = $('log-filter-status')?.value || '';
-  const isAnomaly = $('log-filter-anomaly')?.value || '';
-  let url = `/admin/logs?limit=200`;
-  if (status) url += `&status=${status}`;
-  if (isAnomaly) url += `&isAnomaly=${isAnomaly}`;
-
+  const ip = $('lip').value;
+  const status = $('lst').value;
+  let url = '/admin/logs?limit=200';
+  if (ip) url += '&ip=' + ip;
+  if (status) url += '&status=' + status;
   const res = await api(url);
-  if (!res?.ok) return;
-
-  logsData = res.data.data.logs;
-  renderLogsTable(logsData);
-  $('logs-pagination').textContent = `Showing ${logsData.length} of ${res.data.data.total} entries`;
+  if (!res || !res.ok) return;
+  logsCache = res.data.data.logs;
+  renderLogs(logsCache);
+  $('linfo').textContent = 'Showing ' + logsCache.length + ' of ' + res.data.data.total;
 }
 
-function filterLogs() {
-  const ipFilter = $('log-filter-ip').value.toLowerCase();
-  const statusFilter = $('log-filter-status').value;
-  const anomalyFilter = $('log-filter-anomaly').value;
-
-  let filtered = logsData;
-  if (ipFilter) filtered = filtered.filter(l => l.ip?.toLowerCase().includes(ipFilter));
-  if (statusFilter) filtered = filtered.filter(l => l.status === statusFilter);
-  if (anomalyFilter === 'true') filtered = filtered.filter(l => l.isAnomaly);
-
-  renderLogsTable(filtered);
+function renderLogs(logs) {
+  const tbody = $('ltbody');
+  if (!logs || !logs.length) { tbody.innerHTML = '<tr><td colspan="8"><div class="empty">No logs</div></td></tr>'; return; }
+  tbody.innerHTML = logs.map(function(l) {
+    return '<tr><td>' + fmtT(l.timestamp) + '</td><td style="color:var(--accent)">' + (l.ip||'—') + '</td><td style="color:var(--text3)">' + (l.method||'—') + '</td>' +
+      '<td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (l.endpoint||'—') + '</td>' +
+      '<td><span class="badge badge-' + l.status + '">' + l.status + '</span></td>' +
+      '<td>' + (l.statusCode||'—') + '</td><td>' + (l.responseTime ? l.responseTime+'ms' : '—') + '</td>' +
+      '<td>' + (l.status==='blocked'||l.isAnomaly ? '<button class="bd" style="font-size:10px;padding:4px 8px" onclick="blockIP(\'' + l.ip + '\',\'Log block\')">Block</button>' : '') + '</td></tr>';
+  }).join('');
 }
 
-function renderLogsTable(logs) {
-  const tbody = $('logs-table-body');
-  if (!logs || logs.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">📋</div>No logs found</div></td></tr>';
-    return;
-  }
+$('rlb').onclick = loadLogs;
+$('lip').oninput = loadLogs;
+$('lst').onchange = loadLogs;
 
-  tbody.innerHTML = logs.map(log => `
-    <tr>
-      <td style="white-space:nowrap">${fmtTime(log.timestamp)}</td>
-      <td><span style="color:var(--accent)">${log.ip || '—'}</span></td>
-      <td><span style="color:var(--text3)">${log.method || '—'}</span></td>
-      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${log.endpoint}">${log.endpoint || '—'}</td>
-      <td><span class="badge badge-${log.status}">${log.status || '—'}</span></td>
-      <td>${log.statusCode || '—'}</td>
-      <td>${log.responseTime ? log.responseTime + 'ms' : '—'}</td>
-      <td>${log.isAnomaly ? '<span style="color:var(--orange)">⚠ anomaly</span>' : log.status === 'blocked' ? `<button class="btn btn-ghost" style="font-size:10px;padding:4px 8px" onclick="quickBlock('${log.ip}','From log')">Block</button>` : ''}</td>
-    </tr>
-  `).join('');
-}
-
-function exportLogs() {
-  const headers = ['Timestamp','IP','Method','Endpoint','Status','Code','Response(ms)','Anomaly'];
-  const rows = logsData.map(l => [
-    new Date(l.timestamp).toISOString(), l.ip, l.method, l.endpoint,
-    l.status, l.statusCode, l.responseTime, l.isAnomaly
-  ]);
-  const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
+$('elb').onclick = function() {
+  const csv = ['Timestamp,IP,Method,Endpoint,Status,Code,ms'].concat(logsCache.map(function(l) {
+    return [new Date(l.timestamp).toISOString(),l.ip,l.method,l.endpoint,l.status,l.statusCode,l.responseTime].join(',');
+  })).join('\n');
   const a = document.createElement('a');
   a.href = 'data:text/csv,' + encodeURIComponent(csv);
-  a.download = `firewall-logs-${Date.now()}.csv`;
+  a.download = 'logs.csv';
   a.click();
-  toast('📥 Logs exported!', 'success');
-}
+  toast('Exported!', 'success');
+};
 
-// ═══════════════════════════════════════
-//   ALERTS
-// ═══════════════════════════════════════
+// ALERTS
 async function loadAlerts() {
-  const severity = $('alert-filter-severity')?.value || '';
-  const resolved = $('alert-filter-resolved')?.value || 'false';
-  let url = `/admin/alerts?limit=50&isResolved=${resolved}`;
-  if (severity) url += `&severity=${severity}`;
-
+  const sev = $('asev').value;
+  let url = '/admin/alerts?isResolved=false';
+  if (sev) url += '&severity=' + sev;
   const res = await api(url);
-  if (!res?.ok) return;
-
-  renderAlertsList(res.data.data.alerts, 'alerts-list', false);
+  if (!res || !res.ok) return;
+  renderAlerts(res.data.data.alerts, 'albox', false);
 }
 
-function renderAlertsList(alerts, containerId, compact = false) {
-  const el = $(containerId);
-  if (!alerts || alerts.length === 0) {
-    el.innerHTML = '<div class="empty-state"><div class="empty-icon">✅</div>No alerts found</div>';
-    return;
-  }
+$('rab').onclick = loadAlerts;
+$('asev').onchange = loadAlerts;
 
-  const typeIcons = {
-    burst_traffic: '💥', ddos_attempt: '🌊', brute_force: '🔑',
-    port_scan: '🔍', suspicious_payload: '💉', rate_limit_breach: '⏱',
-    pattern_anomaly: '📊', geo_anomaly: '🌍',
-  };
-
-  el.innerHTML = alerts.map(alert => `
-    <div class="alert-item">
-      <div class="alert-severity-dot ${alert.severity}"></div>
-      <div class="alert-content">
-        <div class="alert-title">${typeIcons[alert.type] || '⚠️'} ${alert.description}</div>
-        <div class="alert-meta">
-          IP: <span style="color:var(--accent)">${alert.ip}</span> ·
-          <span class="badge badge-${alert.severity}">${alert.severity}</span> ·
-          ${timeAgo(alert.timestamp)}
-          ${alert.autoBlocked ? ' · <span style="color:var(--red)">AUTO-BLOCKED</span>' : ''}
-        </div>
-      </div>
-      ${!compact ? `
-      <div class="alert-actions">
-        ${!alert.isResolved ? `<button class="btn btn-green" onclick="resolveAlert('${alert._id}')">✓ Resolve</button>` : '<span style="color:var(--green);font-family:var(--font-mono);font-size:10px">RESOLVED</span>'}
-        <button class="btn btn-danger" onclick="quickBlock('${alert.ip}','Alert: ${alert.type}')">Block IP</button>
-      </div>` : ''}
-    </div>
-  `).join('');
+function renderAlerts(alerts, cid, compact) {
+  const el = $(cid);
+  if (!alerts || !alerts.length) { el.innerHTML = '<div class="empty">✅ No alerts</div>'; return; }
+  const icons = {burst_traffic:'💥',ddos_attempt:'🌊',brute_force:'🔑',port_scan:'🔍',suspicious_payload:'💉'};
+  el.innerHTML = alerts.map(function(a) {
+    return '<div class="aitem"><div class="sdot ' + a.severity + '"></div><div class="ac">' +
+      '<div class="atit">' + (icons[a.type]||'⚠️') + ' ' + a.description + '</div>' +
+      '<div class="amet">IP: <span style="color:var(--accent)">' + a.ip + '</span> · <span class="badge badge-' + a.severity + '">' + a.severity + '</span> · ' + timeAgo(a.timestamp) + (a.autoBlocked?' · <span style="color:var(--red)">AUTO-BLOCKED</span>':'') + '</div>' +
+      '</div>' + (!compact ? '<div class="aact">' + (!a.isResolved ? '<button class="bs" onclick="resolveAlert(\'' + a._id + '\')">✓</button>' : '') + '<button class="bd" onclick="blockIP(\'' + a.ip + '\',\'Alert block\')">Block</button></div>' : '') + '</div>';
+  }).join('');
 }
 
 async function resolveAlert(id) {
-  const res = await api(`/admin/alerts/${id}/resolve`, 'PATCH');
-  if (res?.ok) { toast('✅ Alert resolved', 'success'); loadAlerts(); }
-  else toast('Failed to resolve alert', 'error');
+  const res = await api('/admin/alerts/' + id + '/resolve', 'PATCH');
+  if (res && res.ok) { toast('Resolved!', 'success'); loadAlerts(); }
+  else toast('Failed', 'error');
 }
 
-// ═══════════════════════════════════════
-//   RULES
-// ═══════════════════════════════════════
+// RULES
 async function loadRules() {
-  const res = await api('/admin/rules?limit=200');
-  if (!res?.ok) return;
-
+  const res = await api('/admin/rules');
+  if (!res || !res.ok) return;
   const rules = res.data.data.rules;
-
-  // Separated lists
-  const ips = rules.filter(r => r.type === 'ip_block');
-  const domains = rules.filter(r => r.type === 'domain_block');
-
-  renderRuleTags(ips, 'blocked-ips-list', 'ip');
-  renderRuleTags(domains, 'blocked-domains-list', 'domain');
-
-  // Full table
-  const tbody = $('rules-table-body');
-  if (rules.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state">No active rules</div></td></tr>';
-    return;
-  }
-
-  tbody.innerHTML = rules.map(r => `
-    <tr>
-      <td><span class="tag tag-${r.type.includes('ip') ? 'ip' : 'domain'}">${r.type}</span></td>
-      <td style="color:var(--accent);font-family:var(--font-mono)">${r.value}</td>
-      <td><span class="badge badge-${r.action === 'block' ? 'blocked' : 'allowed'}">${r.action}</span></td>
-      <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis" title="${r.reason}">${r.reason || '—'}</td>
-      <td style="color:var(--orange)">${r.hitCount || 0}</td>
-      <td>${timeAgo(r.lastTriggered)}</td>
-      <td>${timeAgo(r.createdAt)}</td>
-      <td><button class="btn btn-danger" onclick="removeRule('${r._id}')">✕</button></td>
-    </tr>
-  `).join('');
+  const tbody = $('rtbody');
+  if (!rules.length) { tbody.innerHTML = '<tr><td colspan="6"><div class="empty">No rules</div></td></tr>'; return; }
+  tbody.innerHTML = rules.map(function(r) {
+    return '<tr><td><span style="background:rgba(0,144,176,0.15);color:var(--accent);padding:2px 8px;font-size:10px;font-family:var(--mono)">' + r.type + '</span></td>' +
+      '<td style="color:var(--accent);font-family:var(--mono)">' + r.value + '</td>' +
+      '<td>' + (r.reason||'—') + '</td>' +
+      '<td style="color:var(--orange)">' + (r.hitCount||0) + '</td>' +
+      '<td>' + timeAgo(r.createdAt) + '</td>' +
+      '<td><button class="bd" onclick="removeRule(\'' + r._id + '\')">✕ Remove</button></td></tr>';
+  }).join('');
 }
 
-function renderRuleTags(rules, containerId, type) {
-  const el = $(containerId);
-  if (rules.length === 0) {
-    el.innerHTML = `<div class="empty-state">No ${type}s blocked</div>`;
-    return;
-  }
-  el.innerHTML = rules.map(r => `
-    <div class="rule-tag">
-      <div>
-        <div class="rule-type">${r.type}</div>
-        <div style="font-size:13px;margin-top:2px">${r.value}</div>
-      </div>
-      <span class="remove-btn" onclick="removeRule('${r._id}')">✕</span>
-    </div>
-  `).join('');
-}
+$('rrb').onclick = loadRules;
 
 async function removeRule(id) {
-  if (!confirm('Remove this firewall rule?')) return;
-  const res = await api(`/admin/rules/${id}`, 'DELETE');
-  if (res?.ok) { toast('✅ Rule removed', 'success'); loadRules(); }
-  else toast('Failed to remove rule', 'error');
+  if (!confirm('Remove this rule?')) return;
+  const res = await api('/admin/rules/' + id, 'DELETE');
+  if (res && res.ok) { toast('Removed!', 'success'); loadRules(); }
+  else toast('Failed', 'error');
 }
 
-// ═══════════════════════════════════════
-//   BLOCK IP / DOMAIN
-// ═══════════════════════════════════════
-async function submitBlockIP() {
-  const ip = $('block-ip-input').value.trim();
-  const reason = $('block-ip-reason').value.trim();
-  const expiresAt = $('block-ip-expires').value;
+// BLOCK
+$('sibtn').onclick = async function() {
+  const ip = $('bip').value.trim();
+  const reason = $('bipr').value.trim();
+  if (!ip) { toast('Enter IP', 'warn'); return; }
+  await blockIP(ip, reason||'Manual block');
+  $('bip').value = ''; $('bipr').value = '';
+};
 
-  if (!ip) { toast('Enter an IP address', 'warn'); return; }
+$('sdbtn').onclick = async function() {
+  const domain = $('bdom').value.trim();
+  const reason = $('bdomr').value.trim();
+  if (!domain) { toast('Enter domain', 'warn'); return; }
+  const res = await api('/admin/block/domain', 'POST', {domain, reason});
+  if (res && res.ok) { toast('Domain blocked!', 'success'); $('bdom').value = ''; $('bdomr').value = ''; }
+  else toast(res && res.data ? res.data.message : 'Failed', 'error');
+};
 
-  const body = { ip, reason };
-  if (expiresAt) body.expiresAt = new Date(expiresAt).toISOString();
-
-  const res = await api('/admin/block/ip', 'POST', body);
-  if (res?.ok) {
-    toast(`🚫 IP ${ip} blocked!`, 'success');
-    $('block-ip-input').value = '';
-    $('block-ip-reason').value = '';
-  } else {
-    toast(res?.data?.message || 'Failed to block IP', 'error');
-  }
+async function blockIP(ip, reason) {
+  const res = await api('/admin/block/ip', 'POST', {ip, reason});
+  if (res && res.ok) toast('IP ' + ip + ' blocked!', 'success');
+  else toast(res && res.data ? res.data.message : 'Failed', 'error');
 }
 
-async function submitBlockDomain() {
-  const domain = $('block-domain-input').value.trim();
-  const reason = $('block-domain-reason').value.trim();
+document.querySelectorAll('.qip').forEach(function(btn) {
+  btn.onclick = function() { $('bip').value = btn.dataset.ip; $('bipr').value = btn.dataset.r; showPage('block'); };
+});
 
-  if (!domain) { toast('Enter a domain name', 'warn'); return; }
+document.querySelectorAll('.qdom').forEach(function(btn) {
+  btn.onclick = function() { $('bdom').value = btn.dataset.d; $('bdomr').value = btn.dataset.r; showPage('block'); };
+});
 
-  const res = await api('/admin/block/domain', 'POST', { domain, reason });
-  if (res?.ok) {
-    toast(`🌐 Domain ${domain} blocked!`, 'success');
-    $('block-domain-input').value = '';
-    $('block-domain-reason').value = '';
-  } else {
-    toast(res?.data?.message || 'Failed to block domain', 'error');
-  }
-}
-
-function quickBlock(ip, reason) {
-  $('block-ip-input').value = ip;
-  $('block-ip-reason').value = reason;
-  showPage('block');
-  toast(`IP ${ip} populated — click BLOCK to confirm`, 'info');
-}
-
-function quickBlockDomain(domain, reason) {
-  $('block-domain-input').value = domain;
-  $('block-domain-reason').value = reason;
-  showPage('block');
-  toast(`Domain ${domain} populated — click BLOCK to confirm`, 'info');
-}
-
-// ═══════════════════════════════════════
-//   ATTACK SIMULATOR
-// ═══════════════════════════════════════
-async function runSimulation(type) {
-  $('sim-output').style.display = '';
-  $('sim-log').innerHTML = `<span style="color:var(--accent)">$ Running ${type} simulation...</span>\n`;
-
-  const res = await api('/admin/simulate/attack', 'POST', { type, targetIP: '10.0.0.99' });
-
-  if (!res?.ok) {
-    $('sim-log').innerHTML += `<span style="color:var(--red)">ERROR: ${res?.data?.message || 'Simulation failed'}</span>\n`;
-    toast('Simulation failed', 'error');
-    return;
-  }
-
-  const d = res.data.data;
-  $('sim-log').innerHTML += `
-✅ Simulation: ${d.simulationType}
-📡 Target IP: ${d.targetIP}
-📤 Requests Sent: ${d.requestsSent}
-⚠️  Anomalies Detected: ${d.anomaliesDetected}
-
-${d.results?.map(r => `🚨 ${r.severity?.toUpperCase()} — ${r.description}`).join('\n') || 'No alerts generated (check thresholds)'}
-
-✓ Check Alerts & Logs pages for full results
-  `.trim();
-
-  toast(`✅ Simulation complete: ${d.anomaliesDetected} anomaly(ies) detected`, 'success');
-  // Reload dashboard st
+// SIMULATE
+document.querySelectorAll('.simb').forEach(function(btn) {
+  btn.onclick = async function() {
+    const type = btn.dataset.t;
+    btn.disabled = true; btn.textContent = 'Running...';
+    const res = await api('/admin/simulate/attack', 'POST', {type, targetIP:'10.0.0.99'});
+    btn.disabled = false; btn.textContent = 'RUN';
+    if (!res || !res.ok) { toast('Failed', 'error'); return; }
+    const d = res.data.data;
+    $('sout').style.display = '';
+    $('sout').textContent = '✅ Type: ' + d.type + '\n📡 Target: ' + d.targetIP + '\n📤 Requests: ' + d.requestsSent + '\n🚨 Anomalies: ' + d.anomaliesDetected + '\n\n✓ Check Alerts & Logs for results';
+    toast('Done: ' + d.anomaliesDetected + ' anomalies', 'success');
+    setTimeout(loadDash, 1500);
+  };
+});
+</script>
+</body>
+</html>
