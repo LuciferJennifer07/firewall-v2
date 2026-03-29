@@ -382,7 +382,9 @@ function initApp() {
   }, 15000);
 }
 
-if (token && user) initApp();
+window.onload = function() {
+  if (token && user) initApp();
+};
 
 // NAV
 document.querySelectorAll('.nitem').forEach(function(item) {
