@@ -382,9 +382,12 @@ function initApp() {
   }, 15000);
 }
 
-window.onload = function() {
+setTimeout(function() {
+  token = localStorage.getItem('fw_token');
+  user = JSON.parse(localStorage.getItem('fw_user') || 'null');
   if (token && user) initApp();
-};
+}, 100);
+
 
 // NAV
 document.querySelectorAll('.nitem').forEach(function(item) {
